@@ -1,6 +1,6 @@
 import pandas as pd
 import smtplib
 import imaplib
-import mailcow
+from mailcow import MailCow
 
 # File for sandboxing ideas
