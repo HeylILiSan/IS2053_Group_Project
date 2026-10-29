@@ -14,10 +14,10 @@
 # region IMPORT STATEMENTS
 
 import csv # currently not used but idk we'll see
-import numpy as np # used for some fast searching arrays
+import numpy as np # used for quickly searching through arrays
 import pandas as pd  # used for creating a dataframe
-import tkinter as tk # used for making a gui
-from tkinter import filedialog, ttk # additional gui
+import tkinter as tk # used for making a gui, currently not used
+from tkinter import filedialog, ttk # additional gui stuff, currently not used
 
 # endregion
 
