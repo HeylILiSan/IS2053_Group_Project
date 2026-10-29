@@ -82,8 +82,4 @@ def del_entry(df):
         df.drop(df.index[R])
         print("Entry deleted, exiting...")
     elif proceed in n_list:
-        print("Exiting...")
-
-    
-
-
+        print("Exiting..."
