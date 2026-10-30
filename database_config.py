@@ -3,11 +3,13 @@
 # This script is used for viewing and modifying the sender database
 
 # when "senders.csv" is imported as a dataframe, the columns are "Name", "Phone", "Email", and "List"
+# Name: Alias for the contact
+# Phone: Phone number of the contact in E.164 format
+# Email: Email address
+# List: either "white" or "black" for if the user is on the whitelist or blacklist
 
 # TODO
-# 1. Make main function to put all the functionality together
-# 2. Add handling for duplicate values. As in, if the user tries to enter a value for an entry that is already present in another entry, it will block the action and allow the user to cancel the current task
-# 3. maybe make some wrappers to clean up input loops and debug prints
+# 1. Add handling for duplicate values. As in, if the user tries to enter a value for an entry that is already present in another entry, it will block the action and allow the user to cancel the current task
 
 # endregion
 
@@ -409,6 +411,7 @@ def main():
                 else:
                     print("[ERROR]: Invalid input, try again.")
             continue
+
 
 
 if __name__ == "__main__":
