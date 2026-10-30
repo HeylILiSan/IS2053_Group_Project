@@ -16,8 +16,9 @@
 import csv # currently not used but idk we'll see
 import numpy as np # used for quickly searching through arrays
 import pandas as pd  # used for creating a dataframe
+import sys # used for closing the program
 import tkinter as tk # used for making a gui, currently not used
-from tkinter import filedialog, ttk # additional gui stuff, currently not used
+from tkinter import filedialog, ttk # additional gui stuff, currently not use
 
 # endregion
 
@@ -39,7 +40,7 @@ def buffer_reset() -> None: # void function
     # global buffer data
     global buffer
     global buffer_location
-
+    print_brk()
     print("[LOG]: Clearing buffer...")
     buffer = [] # empty buffer
     buffer_location = 0 # set location to 0
@@ -54,16 +55,18 @@ def buffer_save(df : pd.DataFrame) -> None: # void function
     global buffer
     global buffer_location
 
+    print_brk()
+
     if buffer_location < (len(buffer) - 1): # checks to see if current position in buffer is not latest version
         # clears leading entries if so
-        print("NOTICE: Current buffer position not end of buffer.")
+        print("[LOG]: Current buffer position not end of buffer.")
         print("[LOG]: Removing leading entries...")
         x = buffer_location + 1 # index for start of deletion
         del buffer[x:] # delete from index to end
         print("[LOG]: Done.")
     
     print("[LOG]: Saving current state to buffer...")
-    buffer.append(df) # add dataframe to buffer
+    buffer.append(df.copy()) # add dataframe to buffer
     buffer_location += 1 # advance buffer location
     print("[LOG]: Done.")
 
@@ -98,7 +101,7 @@ def redo() -> pd.DataFrame:
     else:
         buffer_location += 1 # advance buffer location
 
-    df = pd.DataFrame(buffer[buffer_location]) # set working dataframe to one at buffer location
+    df = (buffer[buffer_location]).copy() # set working dataframe to one at buffer location
     return df # return
 
 # endregion
@@ -113,11 +116,11 @@ def import_database(p : str = "senders.csv") -> pd.DataFrame:
     buffer_reset()
 
     print(f"[LOG]: Importing database {p} as dataframe...")
-    df = pd.read_csv(p)
+    df = pd.read_csv(p, dtype = {'Phone' : str})
     print("[LOG]: Done.")
 
     print("[LOG]: Saving initial state to buffer...")
-    buffer.append(pf.DataFrame(df))
+    buffer.append(df.copy())
     print("[LOG]: Done.")
     return df
 
@@ -126,7 +129,7 @@ def import_database(p : str = "senders.csv") -> pd.DataFrame:
 def export_database(df : pd.DataFrame, p : str = "senders.csv") -> None:
     """Exports the dataframe to the database csv"""
     print(f"[LOG]: Exporting dataframe to {p}...")
-    df.to_csv(p)
+    df.to_csv(str(p), index = False)
     print("[LOG]: Done.")
 
 # endregion
@@ -135,7 +138,7 @@ def export_database(df : pd.DataFrame, p : str = "senders.csv") -> None:
 
 # this group of functions is for frequently used print statements
 
-def print_brk(x : str) -> None: 
+def print_brk() -> None: 
     """Prints a text break"""
     print("=========================")
 
@@ -146,7 +149,6 @@ def print_df(df : pd.DataFrame) -> None:
     print("======CURRENT STATE======")
     with pd.option_context('display.max_rows', None, 'display.max_columns', None): # temporary formatting change to ensure the FULL dataframe is printed
         print(df) # prints out the dataframe
-    print_brk()
 
 # endregion
 
@@ -242,7 +244,7 @@ def entry_editor(entry : list) -> list:
     while True:
         print_brk()
         print(f"CURRENT STATE: {entry}")
-        i = str(input("[INPUT]: Please select from the following columns by entering the corresponding number, or enter \'q\' to save and quit:\n1 - Name\n2 - Phone Number\n3 - Email Address\n4 - List\n"))
+        i = str(input("[INPUT]: Please select from the following columns by entering the corresponding number, or enter \'q\' to save and quit:\n1 - Name\n2 - Phone Number\n3 - Email Address\n4 - List\n\n"))
         if (i == "q") or (i == "Q"):
             if (entry[1] or entry[2]) and entry[0]:
                 print("[LOG]: Saving and exiting...")
@@ -291,7 +293,6 @@ def entry_editor(entry : list) -> list:
                 continue
     
     print("[LOG]: Exiting entry editor...")
-    print_brk()
     return entry
 
 
@@ -316,6 +317,7 @@ def edit_entry(df : pd.DataFrame) -> pd.DataFrame:
 def add_entry(df : pd.DataFrame) -> pd.DataFrame:
     """Adds a new entry to the dataframe"""
 
+    print_brk()
     print("[LOG]: Creating an empty entry to be added...")
     empty_entry = ['', '', '', '']
     print("[LOG]: Done.")
@@ -333,6 +335,8 @@ def add_entry(df : pd.DataFrame) -> pd.DataFrame:
 
 def del_entry(df : pd.DataFrame) -> pd.DataFrame:
     """Deletes an entry in the dataframe"""
+
+    print_brk()
     R = select_row(df)
     print(f"Contents:\n{df.iloc[[R]]}")
     done = False
@@ -346,9 +350,9 @@ def del_entry(df : pd.DataFrame) -> pd.DataFrame:
             print("[ERROR]: Invalid input, try again.")
     if proceed in y_list:
         print(f"[LOG]: Deleting entry {R}.")
-        df.drop(df.index[R])
+        df = df.drop(index = int(R))
         print("[LOG]: Done.")
-        buffer_save(df)
+        buffer_save(df.copy())
         return df
     elif proceed in n_list:
         print("[LOG]: Exiting...")
@@ -361,8 +365,62 @@ def del_entry(df : pd.DataFrame) -> pd.DataFrame:
 # This region is just for the main function and any additional code i want to test for a sec
 
 def main():
+    """Putting everything together"""
 
-    raise NotImplementedError
+    global buffer
+    global buffer_location
+
+    print("====== DATABSE CONFIGURATOR ======")
+    df = import_database()
+    print_df(df)
+
+    while True:
+        print_brk()
+        choice = ""
+        x = ""
+        choice = str(input("[INPUT]: Please choose from the following options:\n[P]rint dataframe\n[E]dit an entry\n[A]dd an entry\n[D]elete an entry\n[U]ndo\n[R]edo\n[S]ave and exit\n[Q]uit without saving\n\n"))
+        if (choice == "P") or (choice == "p"):
+            print_df(df)
+
+        if (choice == "E") or (choice == "e"):
+            df = edit_entry(df.copy())
+
+        if (choice == "A") or (choice == "a"):
+            df = add_entry(df.copy())
+
+        if (choice == "D") or (choice == "d"):
+            df = del_entry(df.copy())
+
+        if (choice == "U") or (choice == "u"):
+            df = undo()
+
+        if (choice == "R") or (choice == "r"):
+            df = redo()
+
+        if (choice == "S") or (choice == "s"):
+            x = str(input("[INPUT]: Confirm save and exit [Y/n]:\n"))
+            while True:
+                if (x == "Y") or (x == "y") or (not x):
+                    export_database(df.copy())
+                    print("[LOG]: Exiting...")
+                    sys.exit()
+                elif (x == "N") or (x == "n"):
+                    break
+                else:
+                    print("[ERROR]: Invalid input, try again.")
+            continue
+
+        if (choice == "Q") or (choice == "q"):
+            x = str(input("[INPUT]: Confirm quit without saving [Y/n]:\n"))
+            while True:
+                if (x == "Y") or (x == "y") or (not x):
+                    print("[LOG]: Exiting...")
+                    sys.exit()
+                elif (x == "N") or (x == "n"):
+                    break
+                else:
+                    print("[ERROR]: Invalid input, try again.")
+            continue
 
 
 if __name__ == "__main__":
