@@ -343,7 +343,7 @@ def del_entry(df : pd.DataFrame) -> pd.DataFrame:
     y_list = ["y", "Y"]
     n_list = ["n", "N"]
     while not done:
-        proceed = str(input("[INPUT]: Delete this entry? [y/n]"))
+        proceed = str(input("[INPUT]: Delete this entry? [y/n]\n"))
         if (proceed in y_list) or (proceed in n_list):
             done = True
         else:
