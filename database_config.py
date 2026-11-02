@@ -166,26 +166,23 @@ def select_column(df : pd.DataFrame) -> str:
 
     while True:
         # take a column as input
-        C = str(input("[INPUT]: Please select from the following columns by entering the corresponding number:\n1 - Name\n2 - Phone Number\n3 - Email Address\n\n"))
-        try: 
-            # try to convert input into an integer
-            C = int(C)
-            # if it works, check if the integer is in range
-            if 0<C<4:
-                # if it is, break out of loop
-                print("[LOG]: Input taken.")
-                print(f"[LOG]: Column \"{columns[C]}\" selected.")
-                break
-            else:
-                # if not, continue loop
-                print("[ERROR]: Invalid input value, try again.")
-                continue
-        except:
-            # if it fails, continue loop
-            print("[ERROR]: Invalid input type, try again.")
-            continue
+        x = str(input("[INPUT]: Please select from the following columns by entering the corresponding number:\n[N]ame\n[P]hone Number\n[E]mail Address\n\n"))
+        if (x == "N") or (x == "n"):
+            c = "Name"
+            print("[LOG]: Name selected.")
+            break
+        if (x == "P") or (x == "p"):
+            c = "Phone"
+            print("[LOG]: Phone number selected.")
+            break
+        if (x == "E") or (x == "e"):
+            c = "Email"
+            print("[LOG]: Email address selected.")
+            break
+        else:
+            print("[ERROR]: Invalid input, try again.")
 
-    return str(columns[C]) # return column header
+    return str(c) # return column header
 
 
 
