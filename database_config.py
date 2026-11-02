@@ -3,11 +3,13 @@
 # This script is used for viewing and modifying the sender database
 
 # when "senders.csv" is imported as a dataframe, the columns are "Name", "Phone", "Email", and "List"
+# Name: Alias for the contact
+# Phone: Phone number of the contact in E.164 format
+# Email: Email address
+# List: either "white" or "black" for if the user is on the whitelist or blacklist
 
 # TODO
-# 1. Make main function to put all the functionality together
-# 2. Add handling for duplicate values. As in, if the user tries to enter a value for an entry that is already present in another entry, it will block the action and allow the user to cancel the current task
-# 3. maybe make some wrappers to clean up input loops and debug prints
+# 1. Add handling for duplicate values. As in, if the user tries to enter a value for an entry that is already present in another entry, it will block the action and allow the user to cancel the current task
 
 # endregion
 
@@ -244,53 +246,43 @@ def entry_editor(entry : list) -> list:
     while True:
         print_brk()
         print(f"CURRENT STATE: {entry}")
-        i = str(input("[INPUT]: Please select from the following columns by entering the corresponding number, or enter \'q\' to save and quit:\n1 - Name\n2 - Phone Number\n3 - Email Address\n4 - List\n\n"))
-        if (i == "q") or (i == "Q"):
+        i = str(input("[INPUT]: Please select from the following options:\n[N]ame \n[P]hone number\n[E]mail Address\n[L]ist\n[S]ave and exit\n\n"))
+
+        if (i == "N") or (i == "n"):
+            x = ''
+            x = str(input("[INPUT]: Please enter a value for \'Name\':\n"))
+            entry[0] = str(x)
+            print("[LOG]: Value entered.")
+        
+        elif (i == "P") or (i == "p"):
+            x = ''
+            x = str(input("[INPUT]: Please enter a value for \'Phone Number\' as an unbroken string of numbers starting with \'+\' and the country code. Example: +155501234567\n"))
+            entry[1] = str(x)
+            print("[LOG]: Value entered.")
+
+        elif (i == "E") or (i == "e"):
+            x = ''
+            x = str(input("[INPUT]: Please enter a value for \'Email Address\' in standard email format:\n"))
+            entry[2] = str(x)
+            print("[LOG]: Value entered.")
+
+        elif (i == "L") or (i == "l"):
+            x = ''
+            x = str(input("[INPUT]: Plese enter a value for \'List\', either \'white\' or \'black\'.\n"))
+            entry[3] = str(x)
+            print("[LOG]: Value entered.")
+
+        elif (i == "S") or (i == "s"):
             if (entry[1] or entry[2]) and entry[0]:
                 print("[LOG]: Saving and exiting...")
                 break
             else:
                 print(f"[ERROR]: Invalid state. Please enter a value for \'Name\' and at least one of the following columns:\n1. {columns[2]}\n2. {columns[3]}\n")
                 continue
+
         else:
-            try:
-                C = int(i)
-
-                if C == 1:
-
-                    x = ''
-                    x = str(input("[INPUT]: Please enter a value for \'Name\':\n"))
-                    entry[0] = str(x)
-                    print("[LOG]: Value entered.")
-                
-                elif C == 2:
-
-                    x = ''
-                    x = str(input("[INPUT]: Please enter a value for \'Phone Number\' as an unbroken string of numbers starting with \'+\' and the country code. Example: +155501234567\n"))
-                    entry[1] = str(x)
-                    print("[LOG]: Value entered.")
-
-                elif C == 3:
-
-                    x = ''
-                    x = str(input("[INPUT]: Please enter a value for \'Email Address\' in standard email format:\n"))
-                    entry[2] = str(x)
-                    print("[LOG]: Value entered.")
-
-                elif C == 4:
-
-                    x = ''
-                    x = str(input("[INPUT]: Plese enter a value for \'List\', either \'white\' or \'black\'.\n"))
-                    entry[3] = str(x)
-                    print("[LOG]: Value entered.")
-
-                else:
-                    print("[ERROR]: Invalid input, try again.")
-                    continue
-
-            except:
-                print("[ERROR]: Invalid input, try again.")
-                continue
+            print("[ERROR]: Invalid input, try again.")
+            continue
     
     print("[LOG]: Exiting entry editor...")
     return entry
@@ -339,24 +331,22 @@ def del_entry(df : pd.DataFrame) -> pd.DataFrame:
     print_brk()
     R = select_row(df)
     print(f"Contents:\n{df.iloc[[R]]}")
-    done = False
-    y_list = ["y", "Y"]
-    n_list = ["n", "N"]
-    while not done:
-        proceed = str(input("[INPUT]: Delete this entry? [y/n]\n"))
-        if (proceed in y_list) or (proceed in n_list):
-            done = True
+    print_brk()
+    while True:
+        x = str(input("[INPUT]: Delete this entry? [Y/n]\n"))
+        if ((x == "Y") or (x == "y")) or (not x):
+            print(f"[LOG]: Deleting entry {R}.")
+            df = df.drop(index = int(R))
+            print("[LOG]: Done.")
+            buffer_save(df.copy())
+            print("[LOG]: Exiting...")
+            return df
+        elif (x == "N") or (x == "n"):
+            print("[LOG]: Exiting...")
+            return df
         else:
             print("[ERROR]: Invalid input, try again.")
-    if proceed in y_list:
-        print(f"[LOG]: Deleting entry {R}.")
-        df = df.drop(index = int(R))
-        print("[LOG]: Done.")
-        buffer_save(df.copy())
-        return df
-    elif proceed in n_list:
-        print("[LOG]: Exiting...")
-        return df
+            continue
 
 # endregion
 
@@ -421,6 +411,7 @@ def main():
                 else:
                     print("[ERROR]: Invalid input, try again.")
             continue
+
 
 
 if __name__ == "__main__":
