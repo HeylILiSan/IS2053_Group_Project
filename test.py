@@ -3,4 +3,6 @@ import smtplib
 import imaplib
 from mailcow import MailCow
 
+print("Hello World!")
+
 # File for sandboxing ideas
