@@ -6,3 +6,5 @@ from mailcow import MailCow
 print("Hello World!")
 
 # File for sandboxing ideas
+
+print("Hello again!")
