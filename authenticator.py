@@ -34,7 +34,9 @@ if __name__ == "__main__":
 
 #Let me know the changes I need to make
 
-# I like the ideas, but break it down more. I know it can feel redundant but it's good practice.
-# One function for handling inputting trusted emails, returning a list of them
-# One function that takes in a list of trusted emails and an email to be checked and returns true or false for if it's trusted
-# Separating the functionality allows us to better integrate it with the mail server stuff later without completely rewriting stuff
+# FUNCTIONALITY CHANGES
+# The code must now be a function that takes a string argument for an email address and a bool argument for the mode (True for whitelist, False for blacklist), ex: def checker(email_address, mode):
+# The code will use pandas to find that email address in senders.csv
+# if the user is not present, it will ask for additional identifiers like an alias, and if we trust the user, and it will add the user to the database accordingly
+# if the user is present (or added), it will check what list the user is on and, depending on the mode, return True to allow or False to block it
+# the main function in this code, whatever you may call it, will be imported into the communicator and called whenever an incoming email needs to be checked
