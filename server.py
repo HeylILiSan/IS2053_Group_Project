@@ -6,23 +6,39 @@ import signal # check for keyboard interrupt
 from aiosmtpd.controller import Controller # server controller
 
 class MailHandler: # handler object
+
+    async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
+        """Triggers when message is being received, allow/block should go here"""
+
+        sender = envelope.mail_from # string of sender's email address
+
+        # Here would be the code to decide if the email is allowed through or not.
+        # It will take the sender and run it through the authenticator, then set accepted to True or False.
+        accepted = True
+
+        if accepted:
+            envelope.rcpt_tos.append(address)
+            # if accepted, return positive status code 250
+            return "250 ACCEPTED"
+
+        else:
+            # if rejected, return negative status code 550
+            return "550 REJECTED"
+
     async def handle_DATA(self, server, session, envelope):
-        """Triggers when 'DATA' command sent by SMTP client"""
+        """Triggers if message accepted by RCPT"""
 
-        # report new message
-        print("===================================")
-        print(f"=== New Message ===\nSender: {envelope.mail_from}\nRecipient(s): {envelope.rcpt_tos}")
+        # Extracted info
+        Sender = envelope.mail_from # string containing the email address of the sender
+        Receivers = envelope.rcpt_tos # list of strings containing the email addresses of the receivers
+        Contents = envelope.content.decode('utf-8', errors = 'replace') # big string containing a the content type, content transfer encoding, mime version, subject, from, to, and body
 
-        # decode message contents
-        contents = envelope.content.decode('utf-8', errors = 'replace')
-        print(f"Message body:\n")
-        print(contents)
-        print("===================================")
+        print("DEBUG: Message Received")
 
-        # email allow/block goes here
+        # here would be the printout of the message
 
-        # return status code 250 OK
-        return "250 Message accepted for delivery"
+        return "250 OK"
+
 
 
 async def main():
