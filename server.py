@@ -2,6 +2,7 @@
 
 import asyncio # asynchronous script running
 import signal # check for keyboard interrupt
+# pyrefly: ignore[missing-import]
 from aiosmtpd.controller import Controller # server controller
 
 class MailHandler: # handler object
