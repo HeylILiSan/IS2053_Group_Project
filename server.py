@@ -18,6 +18,8 @@ class MailHandler: # handler object
         print(contents)
         print("===================================")
 
+        # email allow/block goes here
+
         # return status code 250 OK
         return "250 Message accepted for delivery"
 
